@@ -1,0 +1,51 @@
+/* Global Styles */
+body {
+  background-color: #121212; /* Dark background for the page */
+  color: #e0e0e0; /* Light text color for readability */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  background-color: #1f1f1f; /* Darker sidebar */
+  color: #ffffff; /* White text for contrast */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .text-blue-600 {
+  color: #76c7c0; /* Slight teal for hover and active state */
+}
+
+.sidebar .text-gray-700 {
+  color: #b0b0b0; /* Gray text */
+}
+
+.sidebar .bg-red-500 {
+  background-color: #c0392b; /* Red button for logout */
+}
+
+/* Sidebar Hover Effect */
+.sidebar li:hover {
+  background-color: #333333; /* Darker hover effect */
+  color: #76c7c0; /* Teal for hover */
+}
+
+/* Main Content Area */
+.main-content {
+  background-color: #1e1e1e; /* Dark background for the content */
+  color: #e0e0e0; /* Light text for readability */
+  padding: 20px;
+}
+
+/* Chart Container - Light Background */
+.chart-container {
+  background-color: #f8f9fa; /* Light background for the chart */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Charts */
+.chart-container .bg-white {
+  background-color: #ffffff; /* White background for the chart */
+}
