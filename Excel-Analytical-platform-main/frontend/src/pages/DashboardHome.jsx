@@ -1,43 +1,39 @@
-// frontend/src/pages/DashboardHome.jsx
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ExcelUpload from '../components/ExcelUpload';
-import ExcelChart from '../components/ExcelChart';
+import { FiUpload, FiBarChart } from 'react-icons/fi';
+// REASON: The import is now corrected to 'useAuth'.
+import { useAuth } from '../components/AuthContext';
 
 const DashboardHome = () => {
-  // Access excelData and handleDataParsed from context
-  const { excelData, handleDataParsed, setExcelData, setColumnHeaders } = useOutletContext();
+  const navigate = useNavigate();
+  // REASON: The context hook is now correctly called 'useAuth'.
+  const { excelData } = useAuth();
 
-  const handleFileUploadAndParsing = (data) => {
-    if (data && data.length > 0) {
-      // Assuming the first row contains headers
-      const headers = Object.keys(data[0]);
-      setColumnHeaders(headers); // Set headers in context
-      setExcelData(data); // Set data in context
-    } else {
-      setColumnHeaders([]);
-      setExcelData([]);
-    }
+  const handleUploadSuccess = () => {
+    navigate('/dashboard/charts');
   };
 
   return (
     <div>
-      {/* Excel Upload Section */}
-      <div className="bg-white rounded-md shadow-md p-6 mb-8 border border-gray-200">
-        <h2 className="text-2xl font-semibold mb-4 text-blue-700">Upload Excel File</h2>
-        {/* Pass the new handler to ExcelUpload */}
-        <ExcelUpload onDataParsed={handleFileUploadAndParsing} />
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+          <FiUpload className="mr-3 text-blue-600" />
+          Upload New Excel File
+        </h2>
+        <p className="text-gray-600 mb-4">Upload a file here to begin your analysis. After uploading, you will be taken to the charting page.</p>
+        <ExcelUpload onUploadSuccess={handleUploadSuccess} />
       </div>
-
-      {/* Default Chart rendering section */}
       {excelData && excelData.length > 0 && (
-        <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
-           <h2 className="text-2xl font-semibold mb-4 text-blue-700">Data Visualization</h2>
-          <ExcelChart data={excelData} />
-        </div>
+          <div className="mt-6 bg-green-50 p-4 rounded-lg border border-green-200 flex items-center justify-between">
+              <p className="text-green-800 font-semibold">Data is ready for charting!</p>
+              <button onClick={() => navigate('/dashboard/charts')} className="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-green-700 transition-all flex items-center">
+                  <FiBarChart className="mr-2" />
+                  Go to Charts
+              </button>
+          </div>
       )}
     </div>
   );
 };
-
 export default DashboardHome;

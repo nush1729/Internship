@@ -1,21 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const authMiddleware = require('../middleware/auth'); // JWT check
+// REASON: Imports the new admin controller logic.
+const { getAllUsers, deleteUser } = require('../controllers/adminController');
+// REASON: Imports both security middlewares.
+const authMiddleware = require('../middleware/authMiddleware');
+const adminMiddleware = require('../middleware/adminMiddleware');
 
-// Get all users (admin only)
-router.get('/users', authMiddleware, async (req, res) => {
-  try {
-    // Only allow admin to access
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ msg: 'Access denied' });
-    }
+// REASON: Defines the endpoint to get all users. It's protected by two middlewares:
+// 1. authMiddleware: Ensures the user is logged in.
+// 2. adminMiddleware: Ensures the logged-in user is an admin.
+router.get('/users', [authMiddleware, adminMiddleware], getAllUsers);
 
-    const users = await User.find().select('-password');
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ msg: err.message });
-  }
-});
+// REASON: Defines the endpoint to delete a user, also protected by both middlewares.
+router.delete('/users/:id', [authMiddleware, adminMiddleware], deleteUser);
 
 module.exports = router;

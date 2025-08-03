@@ -1,106 +1,70 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import api from '../api/axios';
+import { useAuth } from '../components/AuthContext';
 
 const RegisterPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('user'); // default role is user
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', password2: '' });
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const { name, email, password, password2 } = formData;
 
-  const navigate = useNavigate();
+    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    if (password === confirmPassword) {
-      localStorage.setItem('username', email);
-      localStorage.setItem('role', role); // store role
-      // You can also send `role` to your backend here if needed
-      navigate('/login');
-    } else {
-      alert('Passwords do not match');
-    }
-  };
+    const onSubmit = async e => {
+        e.preventDefault();
+        if (password !== password2) {
+            return toast.error('Passwords do not match');
+        }
+        try {
+            const res = await api.post('/auth/register', { name, email, password });
+            login(res.data.token);
+            toast.success('🎉 Registration successful! Welcome.');
+            navigate('/dashboard');
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.msg) {
+                toast.error(err.response.data.msg);
+                if (err.response.data.msg === 'User already exists!') {
+                    setTimeout(() => navigate('/login'), 2000);
+                }
+            } else {
+                toast.error('Registration failed. Please check the backend console for errors.');
+                console.error("Frontend Registration Error:", err);
+            }
+        }
+    };
 
-  return (
-    <div className="bg-gray-100 min-h-screen flex flex-col justify-center items-center">
-      <div className="flex-grow flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-md w-96 border border-gray-300">
-          <h2 className="text-2xl font-bold text-center mb-6 text-blue-800">Register</h2>
-          <form onSubmit={handleRegister}>
-            {/* Email */}
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                id="email"
-                className="w-full p-2 mt-1 border border-gray-300 rounded-md"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border">
+                <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Create Your Account</h2>
+                <form onSubmit={onSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold">Full Name</label>
+                        <input type="text" name="name" value={name} onChange={onChange} required className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold">Email Address</label>
+                        <input type="email" name="email" value={email} onChange={onChange} required className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-semibold">Password</label>
+                        <input type="password" name="password" minLength="6" value={password} onChange={onChange} required className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-semibold">Confirm Password</label>
+                        <input type="password" name="password2" value={password2} onChange={onChange} required className="w-full p-3 border rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+                    <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md">
+                        Sign Up
+                    </button>
+                </form>
+                <p className="mt-6 text-center text-gray-600">
+                    Already have an account? <Link to="/login" className="text-blue-600 hover:underline font-semibold">Login</Link>
+                </p>
             </div>
-
-            {/* Password */}
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                type="password"
-                id="password"
-                className="w-full p-2 mt-1 border border-gray-300 rounded-md"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                className="w-full p-2 mt-1 border border-gray-300 rounded-md"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* 👇 Role Dropdown */}
-            <div className="mb-6">
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">Register as</label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-
-            {/* Register Button */}
-            <button
-              type="submit"
-              className="w-full py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-semibold text-lg"
-            >
-              Register
-            </button>
-
-            {/* Link to Login */}
-            <div className="text-center mt-4">
-              <Link to="/login" className="text-blue-600 hover:underline text-sm">Already have an account? Login here.</Link>
-            </div>
-          </form>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
-
 export default RegisterPage;

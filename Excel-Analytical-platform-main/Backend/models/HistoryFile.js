@@ -1,22 +1,16 @@
-// Example: Login Controller
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+const mongoose = require('mongoose');
 
-  const user = await User.findOne({ email });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
+const HistoryFileSchema = new mongoose.Schema({
+  // REASON: Stores the original name of the file (e.g., 'sales_report.xlsx').
+  originalName: { type: String, required: true },
+  // REASON: Stores the unique filename on the server (e.g., '1678886400000-sales_report.xlsx').
+  filename: { type: String, required: true },
+  // REASON: Stores the server path, needed for deleting the physical file.
+  path: { type: String, required: true },
+  // REASON: Stores the file size in bytes.
+  size: { type: Number, required: true },
+  // REASON: A secure reference linking this file record to the User who uploaded it.
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+}, { timestamps: true }); // REASON: 'createdAt' will serve as the upload date.
 
-  // Generate JWT or other auth here if needed
-
-  res.status(200).json({
-    message: "Login successful",
-    user: {
-      _id: user._id,
-      username: user.username,
-      role: user.role,
-      email: user.email
-    },
-    // token: jwtToken
-  });
-};
+module.exports = mongoose.model('HistoryFile', HistoryFileSchema);

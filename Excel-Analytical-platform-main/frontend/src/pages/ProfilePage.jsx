@@ -1,141 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FiUser, FiEdit, FiSave } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import api from '../api/axios';
+import { useAuth } from '../components/AuthContext';
 
 const ProfilePage = () => {
-  const initialData = {
-    fullName: '',
-    email: '',
-    role: localStorage.getItem('role') || 'User',
-    organization: '',
-    phone: '',
-  };
+    // REASON: Gets the global user object to display their role.
+    const { user: authUser } = useAuth();
+    // REASON: Local state to hold the user's full profile details fetched from the API.
+    const [profile, setProfile] = useState({ name: '', email: '' });
+    // REASON: State to toggle between viewing and editing the profile.
+    const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-  const [profile, setProfile] = useState(initialData);
-  const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState(initialData);
+    // REASON: Fetches the user's profile data when the component first loads.
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await api.get('/auth/profile');
+                setProfile(res.data);
+            } catch (err) {
+                toast.error("Could not fetch profile data.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+    const handleInputChange = (e) => {
+        setProfile({ ...profile, [e.target.name]: e.target.value });
+    };
 
-  const handleSave = () => {
-    setProfile(form);
-    setIsEditing(false);
-  };
+    // REASON: This function is called when the user clicks the "Save" button.
+    const handleSaveChanges = async () => {
+        try {
+            const res = await api.put('/auth/profile', { name: profile.name, email: profile.email });
+            setProfile(res.data);
+            toast.success("Profile updated successfully!");
+            setIsEditing(false); // REASON: Switches back to display mode after saving.
+        } catch (err) {
+            toast.error("Failed to update profile.");
+        }
+    };
 
-  const handleCancel = () => {
-    setForm(profile);
-    setIsEditing(false);
-  };
+    if (isLoading) return <div>Loading Profile...</div>;
 
-  return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg border border-gray-200">
-      <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">Profile</h2>
-
-      {isEditing ? (
-        <form className="space-y-5">
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input
-              type="text"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              placeholder="Enter your name"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Role Dropdown */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
-            </select>
-          </div>
-
-          {/* Organization */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
-            <input
-              type="text"
-              name="organization"
-              value={form.organization}
-              onChange={handleChange}
-              placeholder="Enter your organization"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-            <input
-              type="text"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-4 text-gray-800">
-          <p><strong>Name:</strong> {profile.fullName || <span className="text-gray-400 italic">Not set</span>}</p>
-          <p><strong>Email:</strong> {profile.email || <span className="text-gray-400 italic">Not set</span>}</p>
-          <p><strong>Role:</strong> {profile.role}</p>
-          <p><strong>Organization:</strong> {profile.organization || <span className="text-gray-400 italic">Not set</span>}</p>
-          <p><strong>Phone:</strong> {profile.phone || <span className="text-gray-400 italic">Not set</span>}</p>
-
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Edit Profile
-          </button>
+    return (
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+                    <FiUser className="mr-3 text-teal-600" />
+                    User Profile
+                </h2>
+                {/* REASON: Toggles between the Edit and Save buttons based on the 'isEditing' state. */}
+                {!isEditing ? (
+                    <button onClick={() => setIsEditing(true)} className="flex items-center bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-600">
+                        <FiEdit className="mr-2" /> Edit
+                    </button>
+                ) : (
+                    <button onClick={handleSaveChanges} className="flex items-center bg-green-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-green-600">
+                        <FiSave className="mr-2" /> Save
+                    </button>
+                )}
+            </div>
+            <div className="space-y-4">
+                <div>
+                    <label className="text-sm font-semibold text-gray-600">Full Name</label>
+                    {isEditing ? (
+                        <input type="text" name="name" value={profile.name} onChange={handleInputChange} className="w-full text-lg p-2 border rounded mt-1" />
+                    ) : (
+                        <p className="text-lg text-gray-800 p-2 bg-gray-50 rounded mt-1">{profile.name}</p>
+                    )}
+                </div>
+                <div>
+                    <label className="text-sm font-semibold text-gray-600">Email Address</label>
+                    {/* REASON: Email is displayed but not editable in this implementation for simplicity. */}
+                    <p className="text-lg text-gray-800 p-2 bg-gray-50 rounded mt-1">{profile.email}</p>
+                </div>
+                <div>
+                    <label className="text-sm font-semibold text-gray-600">User Role</label>
+                    <p className="text-lg text-gray-800 p-2 bg-gray-50 rounded mt-1 capitalize">{authUser?.role}</p>
+                </div>
+            </div>
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default ProfilePage;

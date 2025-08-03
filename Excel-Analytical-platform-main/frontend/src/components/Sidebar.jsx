@@ -1,64 +1,50 @@
-// frontend/src/components/Sidebar.jsx
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { FiHome, FiBox, FiClock, FiUser, FiLogOut, FiGrid, FiBarChart } from 'react-icons/fi';
+import { useAuth } from './AuthContext';
+
+const SidebarLink = ({ to, icon, children }) => (
+  <NavLink
+    to={to}
+    end
+    className={({ isActive }) =>
+      `flex items-center py-3 px-4 my-1 transition-colors duration-200 rounded-lg ${
+        isActive ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-200'
+      }`
+    }
+  >
+    {icon}
+    <span className="mx-4 font-medium">{children}</span>
+  </NavLink>
+);
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const username = localStorage.getItem("username") || "User";
-  const role = localStorage.getItem("role");
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
-
-  const navItemClass = (path) =>
-    `text-gray-700 hover:text-blue-700 cursor-pointer transition duration-150 ease-in-out ${
-      location.pathname === path ? "font-bold text-blue-700" : ""
-    }`;
+  const { logout } = useAuth();
 
   return (
-    <div className="fixed top-0 left-0 w-64 h-full bg-white shadow-md p-4 flex flex-col justify-between text-gray-800 border-r border-gray-200">
-      <div>
-        <h2
-          className="text-xl font-bold text-blue-800 mb-6 truncate"
-          title={username}
-        >
-          Hi, {username} 👋
-        </h2>
-
-        <ul className="space-y-4">
-          <li onClick={() => navigate("/dashboard")} className={navItemClass("/dashboard")}>
-            Dashboard
-          </li>
-          <li onClick={() => navigate("/dashboard/3dchart")} className={navItemClass("/dashboard/3dchart")}>
-            3D Chart
-          </li>
-          <li onClick={() => navigate("/dashboard/profile")} className={navItemClass("/dashboard/profile")}>
-            Profile
-          </li>
-          <li onClick={() => navigate("/dashboard/history")} className={navItemClass("/dashboard/history")}>
-            History
-          </li>
-
-          {role === "admin" && (
-            <li
-              onClick={() => navigate("/dashboard/admin")}
-              className="text-red-600 hover:text-red-800 cursor-pointer transition duration-150 ease-in-out font-semibold"
-            >
-              Admin Panel
-            </li>
-          )}
-        </ul>
+    <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 shadow-md">
+      <div className="flex items-center justify-center h-20 border-b">
+        <FiGrid className="h-6 w-6 text-blue-600" />
+        <span className="ml-2 text-xl font-bold text-gray-800">ExcelAnalyzer</span>
       </div>
-
-      <button
-        onClick={handleLogout}
-        className="bg-red-600 text-white px-4 py-2 mt-6 rounded-md hover:bg-red-700 transition duration-300 ease-in-out font-semibold"
-      >
-        Logout
-      </button>
+      <div className="flex-1 overflow-y-auto p-4">
+        <nav>
+          <SidebarLink to="/dashboard" icon={<FiHome className="h-5 w-5" />}>Dashboard</SidebarLink>
+          <SidebarLink to="/dashboard/charts" icon={<FiBarChart className="h-5 w-5" />}>2D Charts</SidebarLink>
+          <SidebarLink to="/dashboard/3d-chart" icon={<FiBox className="h-5 w-5" />}>3D Chart</SidebarLink>
+          <SidebarLink to="/dashboard/history" icon={<FiClock className="h-5 w-5" />}>History</SidebarLink>
+          <SidebarLink to="/dashboard/profile" icon={<FiUser className="h-5 w-5" />}>Profile</SidebarLink>
+        </nav>
+      </div>
+      <div className="p-4 border-t">
+        <button
+          onClick={logout}
+          className="flex items-center w-full py-3 px-4 text-gray-600 hover:bg-red-100 hover:text-red-700 rounded-lg transition-colors duration-200"
+        >
+          <FiLogOut className="h-5 w-5" />
+          <span className="mx-4 font-medium">Logout</span>
+        </button>
+      </div>
     </div>
   );
 };
