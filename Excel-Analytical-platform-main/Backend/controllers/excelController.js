@@ -3,13 +3,13 @@ const xlsx = require('xlsx');
 const fs = require('fs');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// REASON: Initialize the Google AI client with your API key.
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Logic to handle a file upload.
 exports.uploadFile = async (req, res) => {
     try {
-        if (!req.file) return res.status(400).json({ msg: 'No file was uploaded.' });
+        if (!req.file) {
+            return res.status(400).json({ msg: 'No file was uploaded.' });
+        }
         const { originalname, filename, path: filePath, size } = req.file;
         const newFile = new HistoryFile({
             originalName: originalname,
@@ -19,17 +19,39 @@ exports.uploadFile = async (req, res) => {
             user: req.user.id,
         });
         await newFile.save();
-        // REASON: This block reads the uploaded Excel file and sends its data back to the frontend immediately for visualization.
+
+        // --- REASON FOR CHANGE: This is the corrected and more robust parsing logic ---
         const workbook = xlsx.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
-        const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // REASON: Using {header: 1} converts the sheet into an array of arrays. This is a more reliable way to read raw data.
+        const rows = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+
+        // REASON: This is a critical check. If the file is empty or unreadable, we stop here and send an error.
+        if (!rows || rows.length === 0) {
+            return res.status(400).json({ msg: 'Could not read any data from the Excel file. It might be empty or corrupted.' });
+        }
+
+        // REASON: This converts the array of arrays into an array of objects, using the first row as the keys (headers).
+        const headers = rows[0];
+        const data = rows.slice(1).map(row => {
+            let rowData = {};
+            headers.forEach((header, index) => {
+                rowData[header] = row[index];
+            });
+            return rowData;
+        });
+        // --- END OF CORRECTED LOGIC ---
+
         res.status(201).json({ msg: 'File uploaded successfully!', file: newFile, data });
     } catch (err) {
-        res.status(500).send('Server Error');
+        console.error("UPLOAD ERROR:", err.message);
+        res.status(500).json({ msg: 'A server error occurred during file processing.' });
     }
 };
 
-// Logic to fetch the file history for the logged-in user.
+// --- The rest of the functions are correct and do not need to be changed ---
 exports.getFileHistory = async (req, res) => {
     try {
         const files = await HistoryFile.find({ user: req.user.id }).sort({ createdAt: -1 });
@@ -39,7 +61,6 @@ exports.getFileHistory = async (req, res) => {
     }
 };
 
-// Logic to delete a file.
 exports.deleteFile = async (req, res) => {
     try {
         const file = await HistoryFile.findById(req.params.id);
@@ -55,7 +76,6 @@ exports.deleteFile = async (req, res) => {
     }
 };
 
-// Logic for the new AI Summary feature.
 exports.getAiSummary = async (req, res) => {
     try {
         const { data, chartType, xAxis, yAxis } = req.body;
