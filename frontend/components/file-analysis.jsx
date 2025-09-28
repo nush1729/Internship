@@ -13,22 +13,16 @@ export function FileAnalysisInlineView({ file, onClose }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // When the component mounts or file changes, try to retrieve the file data
   useEffect(() => {
-    console.log("file received:", file);
-
     if (file && file.originalFile) {
-      console.log("Using originalFile:", file.originalFile);
       setFileData(file.originalFile);
     } else if (file && (file.id || file.fileId)) {
-      console.log("Fetching file data from server:", file.id || file.fileId);
       fetchFileData(file.id || file.fileId);
     } else {
       setError("File data is not available for chart creation.");
     }
   }, [file]);
 
-  // Function to fetch file data from backend
   const fetchFileData = async (fileId) => {
     setLoading(true);
     try {
@@ -45,7 +39,6 @@ export function FileAnalysisInlineView({ file, onClose }) {
       const result = await response.json();
       
       if (result.success && result.data) {
-        // Create a virtual file object with the data
         const virtualFile = {
           name: result.filename,
           data: result.data,
@@ -70,13 +63,15 @@ export function FileAnalysisInlineView({ file, onClose }) {
 
   return (
     <>
-      <Card className="border border-pink-500/20 bg-white/10 text-white">
-        <CardHeader className="flex items-center justify-between">
-          <CardTitle>Analysis for: {file.filename || file.name}</CardTitle>
+      <Card className="border border-blue-200 bg-white/80 backdrop-blur-lg mt-6 shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base text-slate-800">
+            Analysis for: <span className="font-semibold text-blue-600">{file.filename || file.name}</span>
+          </CardTitle>
           <Button
             variant="ghost"
             size="icon"
-            className="text-slate-400 hover:text-red-500"
+            className="text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 w-8 h-8"
             onClick={onClose}
           >
             <X className="w-4 h-4" />
@@ -84,34 +79,31 @@ export function FileAnalysisInlineView({ file, onClose }) {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div>
+          <div className="text-sm text-slate-600 grid grid-cols-3 gap-4">
             <p>
-              <strong>Size:</strong>{" "}
+              <strong className="text-slate-700">Size:</strong>{" "}
               {file.filesize || file.size || "Unknown"}
             </p>
             <p>
-              <strong>Uploaded at:</strong>{" "}
+              <strong className="text-slate-700">Uploaded at:</strong>{" "}
               {file.uploadedAt
               ? new Date(file.uploadedAt).toLocaleString("en-IN", {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
               })
               : "-"}
             </p>
 
             <p>
-              <strong>Charts Detected:</strong> {file.charts ?? 0}
+              <strong className="text-slate-700">Charts Detected:</strong> {file.charts ?? 0}
             </p>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-2"></div>
-              <span className="text-blue-400">Loading file data...</span>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-2"></div>
+              <span className="text-blue-600">Loading file data...</span>
             </div>
           ) : error ? (
             <Alert variant="destructive">
@@ -122,9 +114,7 @@ export function FileAnalysisInlineView({ file, onClose }) {
           ) : (
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-[--neon-dark] text-white border border-[--neon-blue] shadow-[0_0_10px_rgba(0,191,255,0.6)] 
-             hover:bg-gradient-to-r hover:from-[--neon-blue] hover:to-[--neon-cyan] 
-             hover:shadow-[0_0_20px_rgba(0,255,255,0.8)] transition duration-300"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
               disabled={!fileData}
             >
               <BarChart3 className="w-4 h-4 mr-2" />

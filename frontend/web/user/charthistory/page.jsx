@@ -24,7 +24,6 @@ import {
   BarChart3,
   Download,
   Eye,
-  CuboidIcon as Cube,
   Search,
   Filter,
   Trash2,
@@ -32,7 +31,6 @@ import {
 } from "lucide-react";
 import { UploadDialog } from "@/components/upload-dialog";
 import { DashboardSidebar } from "@/components/dashboard-sidebar";
-import Aurora from "@/components/ui/aurora";
 import { toast } from "sonner";
 
 export default function ChartsHistoryPage() {
@@ -47,18 +45,13 @@ export default function ChartsHistoryPage() {
   useEffect(() => {
     const loadCharts = () => {
       try {
-        const storedCharts = JSON.parse(
-          localStorage.getItem("userCharts") || "[]"
-        );
+        const storedCharts = JSON.parse(localStorage.getItem("userCharts") || "[]");
         setCharts(storedCharts);
-        setFilteredCharts(storedCharts);
       } catch (error) {
         console.error("Error loading charts:", error);
         setCharts([]);
-        setFilteredCharts([]);
       }
     };
-
     loadCharts();
     const handleStorageChange = () => loadCharts();
     window.addEventListener("storage", handleStorageChange);
@@ -66,56 +59,25 @@ export default function ChartsHistoryPage() {
   }, []);
 
   useEffect(() => {
-    const filtered = charts.filter((chart) => {
-      const matchesSearch = chart.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const matchesType =
-        filterType === "all" ||
-        chart.type.toLowerCase() === filterType.toLowerCase();
+    let filtered = charts.filter((chart) => {
+      const matchesSearch = chart.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = filterType === "all" || chart.type.toLowerCase() === filterType.toLowerCase();
       return matchesSearch && matchesType;
     });
 
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case "newest":
-          return new Date(b.created) - new Date(a.created);
-        case "oldest":
-          return new Date(a.created) - new Date(b.created);
-        case "most-viewed":
-          return (b.views || 0) - (a.views || 0);
-        case "most-downloaded":
-          return (b.downloads || 0) - (a.downloads || 0);
-        case "title":
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
+        case "newest": return new Date(b.created) - new Date(a.created);
+        case "oldest": return new Date(a.created) - new Date(b.created);
+        case "title": return a.title.localeCompare(b.title);
+        default: return 0;
       }
     });
-
     setFilteredCharts(filtered);
   }, [charts, searchTerm, filterType, sortBy]);
 
   const handleViewChart = (chartId) => {
-    const updatedCharts = charts.map((chart) =>
-      chart.id === chartId
-        ? { ...chart, views: (chart.views || 0) + 1 }
-        : chart
-    );
-    localStorage.setItem("userCharts", JSON.stringify(updatedCharts));
-    setCharts(updatedCharts);
     navigate(`/chart/${chartId}`);
-  };
-
-  const handleDownloadChart = (chartId) => {
-    const updatedCharts = charts.map((chart) =>
-      chart.id === chartId
-        ? { ...chart, downloads: (chart.downloads || 0) + 1 }
-        : chart
-    );
-    localStorage.setItem("userCharts", JSON.stringify(updatedCharts));
-    setCharts(updatedCharts);
-    console.log("Downloading chart:", chartId);
   };
 
   const handleDeleteChart = (chart) => {
@@ -124,22 +86,12 @@ export default function ChartsHistoryPage() {
 
   const confirmDeleteChart = () => {
     if (!deleteDialog.chart) return;
-
     try {
-      // Remove chart from localStorage
       const updatedCharts = charts.filter(chart => chart.id !== deleteDialog.chart.id);
       localStorage.setItem("userCharts", JSON.stringify(updatedCharts));
-      
-      // Remove chart config from localStorage
       localStorage.removeItem(`chartConfig_${deleteDialog.chart.id}`);
-      
-      // Update state
       setCharts(updatedCharts);
-      
-      // Close dialog
       setDeleteDialog({ open: false, chart: null });
-      
-      // Show success message
       toast.success(`Chart "${deleteDialog.chart.title}" deleted successfully`);
     } catch (error) {
       console.error("Error deleting chart:", error);
@@ -147,194 +99,111 @@ export default function ChartsHistoryPage() {
     }
   };
 
-  const getUniqueChartTypes = () => {
-    const types = [...new Set(charts.map((chart) => chart.type))];
-    return types;
-  };
-
-  const handleChartCreated = () => {
-    const event = new Event("storage");
-    window.dispatchEvent(event);
-  };
+  const getUniqueChartTypes = () => [...new Set(charts.map((chart) => chart.type))];
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a23] text-white relative overflow-hidden">
-      <div className="absolute inset-0 z-0 opacity-60 h-full ">
-        <Aurora
-          colorStops={["#0038ff", "#00d4ff", "#002233"]}
-          amplitude={1.2}
-          blend={0.4} 
-        />
-      </div>
+    <div className="flex min-h-screen bg-slate-50 text-slate-800">
       <DashboardSidebar />
+      <main className="flex-1 p-8">
+        <header className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="h-8 w-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-slate-900">Charts History</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full font-medium">
+              {filteredCharts.length} of {charts.length} charts found
+            </div>
+            <UploadDialog onUploadSuccess={() => window.dispatchEvent(new Event("storage"))} />
+          </div>
+        </header>
 
-      <div className="flex-1 z-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mt-12">
-            <div className="flex items-center gap-2">
-              <h1 className="text-4xl font-bold text-white">
-                Charts History
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-cyan-300 bg-cyan-950 border border-cyan-400 px-3 py-1 rounded-full">
-                {filteredCharts.length} of {charts.length} charts
-              </div>
-              <UploadDialog onChartCreated={handleChartCreated} />
-            </div>
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search charts by title..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-full sm:w-48">
+                <Filter className="h-4 w-4 mr-2 text-slate-500" />
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                {getUniqueChartTypes().map((type) => (
+                  <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="title">Title A-Z</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-cyan-300" />
-                <Input
-                  placeholder="Search charts..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-cyan-600 bg-black text-cyan-200"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger className="w-40 border-cyan-600 bg-black text-white">
-                    <Filter className="h-4 w-4 mr-2 text-cyan-400" />
-                    <SelectValue placeholder="Filter by type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black border-cyan-600 text-white">
-                    <SelectItem value="all">All Types</SelectItem>
-                    {getUniqueChartTypes().map((type) => (
-                      <SelectItem key={type} value={type.toLowerCase()}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-40 border-cyan-600 bg-black text-white">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black border-cyan-600 text-white">
-                    <SelectItem value="newest">Newest First</SelectItem>
-                    <SelectItem value="oldest">Oldest First</SelectItem>
-                    <SelectItem value="most-viewed">Most Viewed</SelectItem>
-                    <SelectItem value="most-downloaded">Most Downloaded</SelectItem>
-                    <SelectItem value="title">Title A-Z</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+        {filteredCharts.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-lg border border-dashed">
+            <BarChart3 className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+            <h3 className="text-lg font-medium text-slate-700">
+              {charts.length === 0 ? "No charts created yet" : "No charts match your search"}
+            </h3>
+            <p className="text-slate-500 mt-2">
+              {charts.length === 0 ? "Upload a file to get started!" : "Try adjusting your filters."}
+            </p>
           </div>
-
-          {/* Charts Grid */}
-          {filteredCharts.length === 0 ? (
-            <div className="text-center py-1 flex flex-wrap flex-col">
-              <h3 className="text-lg font-medium text-cyan-300 mb-2">
-                {charts.length === 0
-                  ? "No charts created yet "
-                  : "No charts match your search"}
-              </h3>
-              <p className="text-cyan-400 mb-6">
-                {charts.length === 0
-                  ? "Upload an Excel file and create your first chart!"
-                  : "Try adjusting your search terms or filters"}
-              </p>
-              {charts.length === 0 ? (
-                <UploadDialog onChartCreated={handleChartCreated} />
-              ) : null}
-            </div>
-          ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              {filteredCharts.map((chart) => (
-                <div
-                  key={chart.id}
-                  className="bg-black border border-cyan-600 rounded-xl shadow-md p-6 flex flex-col justify-between hover:shadow-xl transition-shadow h-full"
-                >
-                  <div className="flex items-center justify-between mb-3 text-cyan-300 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Cube className="h-4 w-4" />
-                      <span className="capitalize">{chart.type}</span>
-                    </div>
-                    <span className="text-xs">
-                      {new Date(chart.created).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <h2 className="text-lg font-semibold text-cyan-100 mb-3 break-words">
-                    {chart.title}
-                  </h2>
-
-                  <div className="flex items-center gap-2 flex-wrap text-xs text-cyan-400 mb-4">
-                    <Badge variant="outline" className="border-cyan-500 text-cyan-300">
-                      Views: {chart.views || 0}
-                    </Badge>
-                    <Badge variant="outline" className="border-cyan-500 text-cyan-300">
-                      Downloads: {chart.downloads || 0}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center gap-2 mt-auto pt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-cyan-400 border-cyan-500 bg-black hover:bg-cyan-900/20"
-                      onClick={() => handleDownloadChart(chart.id)}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                      onClick={() => handleViewChart(chart.id)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-red-400 border-red-500 bg-black hover:bg-red-900/20"
-                      onClick={() => handleDeleteChart(chart)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+        ) : (
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredCharts.map((chart) => (
+              <div key={chart.id} className="bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-lg transition-shadow p-5 flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="outline">{chart.type}</Badge>
+                  <p className="text-xs text-slate-500">{new Date(chart.created).toLocaleDateString()}</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+                <div className="h-32 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart3 className="h-10 w-10 text-blue-500" />
+                </div>
+                <h2 className="text-base font-semibold text-slate-800 mb-2 truncate" title={chart.title}>{chart.title}</h2>
+                <p className="text-xs text-slate-500 mb-4 truncate">From: {chart.file}</p>
+                <div className="flex items-center gap-2 mt-auto">
+                  <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => handleViewChart(chart.id)}>
+                    <Eye className="h-4 w-4 mr-2" /> View
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleDeleteChart(chart)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, chart: null })}>
-        <DialogContent className="bg-black border-red-600 text-white">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Delete Chart
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" /> Delete Chart
             </DialogTitle>
-            <DialogDescription className="text-red-300">
-              Are you sure you want to delete "{deleteDialog.chart?.title}"? This action cannot be undone.
+            <DialogDescription>
+              Are you sure you want to delete "{deleteDialog.chart?.title}"? This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialog({ open: false, chart: null })}
-              className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/20"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={confirmDeleteChart}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
+            <Button variant="outline" onClick={() => setDeleteDialog({ open: false, chart: null })}>Cancel</Button>
+            <Button onClick={confirmDeleteChart} className="bg-red-600 hover:bg-red-700">
               Delete Chart
             </Button>
           </DialogFooter>

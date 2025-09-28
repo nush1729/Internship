@@ -12,52 +12,19 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Download, Share2, CuboidIcon as Cube, Settings, Save } from "lucide-react"
 import toast from "react-hot-toast"
 
-// Define color themes for chart customization (copied from ChartCreationDialog)
 const colorThemes = [
-  {
-    name: "Default",
-    colors: ["#00FFFF", "#66D9EF", "#FF6B6B", "#FFD700", "#8B5CF6"], // Greenish-cyan as primary
-  },
-  {
-    name: "Ocean",
-    colors: ["#0ea5e9", "#06b6d4", "#0891b2", "#0e7490", "#155e75"],
-  },
-  {
-    name: "Forest",
-    colors: ["#10b981", "#059669", "#047857", "#065f46", "#064e3b"],
-  },
-  {
-    name: "Sunset",
-    colors: ["#f59e0b", "#f97316", "#ef4444", "#dc2626", "#b91c1c"],
-  },
-  {
-    name: "Purple",
-    colors: ["#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6", "#4c1d95"],
-  },
-  {
-    name: "Yellow",
-    colors: ["#f1c40f", "#f39c12", "#e67e22", "#d35400", "#c0392b"],
-  },
-]
+  { name: "Default", colors: ["#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#dbeafe"] },
+  { name: "Ocean", colors: ["#0ea5e9", "#06b6d4", "#0891b2", "#0e7490", "#155e75"] },
+  { name: "Forest", colors: ["#10b981", "#059669", "#047857", "#065f46", "#064e3b"] },
+  { name: "Sunset", colors: ["#f59e0b", "#f97316", "#ef4444", "#dc2626", "#b91c1c"] },
+  { name: "Purple", colors: ["#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6", "#4c1d95"] },
+];
 
 const fontFamilies = [
-  "Arial",
-  "Verdana",
-  "Helvetica",
-  "Tahoma",
-  "Trebuchet MS",
-  "Georgia",
-  "Times New Roman",
-  "Courier New",
-  "Lucida Console",
-  "Roboto",
-  "Open Sans",
-  "Lato",
-  "Montserrat",
-  "sans-serif",
-  "serif",
-  "monospace",
-]
+  "Arial", "Verdana", "Helvetica", "Tahoma", "Trebuchet MS", "Georgia",
+  "Times New Roman", "Courier New", "Lucida Console", "Roboto", "Open Sans",
+  "Lato", "Montserrat", "sans-serif", "serif", "monospace",
+];
 
 export default function ChartPage() {
   const navigate = useNavigate()
@@ -69,40 +36,38 @@ export default function ChartPage() {
   const [error, setError] = useState(null)
   const [showCustomization, setShowCustomization] = useState(false)
 
-  // States for customizable properties
+  // Customizable properties
   const [currentChartTitle, setCurrentChartTitle] = useState("")
   const [currentSelectedTheme, setCurrentSelectedTheme] = useState("Default")
   const [currentShowLegend, setCurrentShowLegend] = useState(true)
   const [currentShowGrid, setCurrentShowGrid] = useState(true)
-  const [currentPlotBgColor, setCurrentPlotBgColor] = useState("#1C1C1C") // Dark background
-  const [currentPaperBgColor, setCurrentPaperBgColor] = useState("#1C1C1C") // Dark background
-  const [currentFontColor, setCurrentFontColor] = useState("#E0E0E0") // Soft white
-  const [currentGlobalFontSize, setCurrentGlobalFontSize] = useState(14) // New global font size
-  const [currentGlobalFontFamily, setCurrentGlobalFontFamily] = useState("Roboto") // New global font family
+  const [currentPlotBgColor, setCurrentPlotBgColor] = useState("#f1f5f9") // Light Slate
+  const [currentPaperBgColor, setCurrentPaperBgColor] = useState("#ffffff") // White
+  const [currentFontColor, setCurrentFontColor] = useState("#334155") // Dark Slate
+  const [currentGlobalFontSize, setCurrentGlobalFontSize] = useState(14)
+  const [currentGlobalFontFamily, setCurrentGlobalFontFamily] = useState("Roboto")
   const [currentLegendFontSize, setCurrentLegendFontSize] = useState(12)
-  const [currentLegendFontColor, setCurrentLegendFontColor] = useState("#E0E0E0")
+  const [currentLegendFontColor, setCurrentLegendFontColor] = useState("#475569")
   const [currentLegendFontFamily, setCurrentLegendFontFamily] = useState("Roboto")
   const [currentXAxisLabelFontSize, setCurrentXAxisLabelFontSize] = useState(12)
-  const [currentXAxisLabelFontColor, setCurrentXAxisLabelFontColor] = useState("#E0E0E0")
+  const [currentXAxisLabelFontColor, setCurrentXAxisLabelFontColor] = useState("#475569")
   const [currentXAxisLabelFontFamily, setCurrentXAxisLabelFontFamily] = useState("Roboto")
   const [currentYAxisLabelFontSize, setCurrentYAxisLabelFontSize] = useState(12)
-  const [currentYAxisLabelFontColor, setCurrentYAxisLabelFontColor] = useState("#E0E0E0")
+  const [currentYAxisLabelFontColor, setCurrentYAxisLabelFontColor] = useState("#475569")
   const [currentYAxisLabelFontFamily, setCurrentYAxisLabelFontFamily] = useState("Roboto")
   const [currentZAxisLabelFontSize, setCurrentZAxisLabelFontSize] = useState(12)
-  const [currentZAxisLabelFontColor, setCurrentZAxisLabelFontColor] = useState("#E0E0E0")
+  const [currentZAxisLabelFontColor, setCurrentZAxisLabelFontColor] = useState("#475569")
   const [currentZAxisLabelFontFamily, setCurrentZAxisLabelFontFamily] = useState("Roboto")
 
   const { id } = useParams()
   const chartId = id
 
-  // Load chart config from localStorage and initialize customization states
   useEffect(() => {
     if (!chartId) {
       setError("No chart ID provided")
       setLoading(false)
       return
     }
-
     try {
       const config = localStorage.getItem(`chartConfig_${chartId}`)
       if (!config) {
@@ -110,35 +75,32 @@ export default function ChartPage() {
         setLoading(false)
         return
       }
-
       const parsedConfig = JSON.parse(config)
       setChartConfig(parsedConfig)
-
-      // Initialize customization states from loaded config
+      // Initialize states from loaded config
       setCurrentChartTitle(parsedConfig.chartTitle || "")
       setCurrentSelectedTheme(parsedConfig.selectedTheme || "Default")
       setCurrentShowLegend(parsedConfig.showLegend !== undefined ? parsedConfig.showLegend : true)
       setCurrentShowGrid(parsedConfig.showGrid !== undefined ? parsedConfig.showGrid : true)
-      setCurrentPlotBgColor(parsedConfig.plotBgColor || "#1C1C1C")
-      setCurrentPaperBgColor(parsedConfig.paperBgColor || "#1C1C1C")
-      setCurrentFontColor(parsedConfig.fontColor || "#E0E0E0") // Softer default
+      setCurrentPlotBgColor(parsedConfig.plotBgColor || "#f1f5f9")
+      setCurrentPaperBgColor(parsedConfig.paperBgColor || "#ffffff")
+      setCurrentFontColor(parsedConfig.fontColor || "#334155")
       setCurrentGlobalFontSize(parsedConfig.globalFontSize || 14)
       setCurrentGlobalFontFamily(parsedConfig.globalFontFamily || "Roboto")
       setCurrentLegendFontSize(parsedConfig.legendFontSize || 12)
-      setCurrentLegendFontColor(parsedConfig.legendFontColor || "#E0E0E0")
+      setCurrentLegendFontColor(parsedConfig.legendFontColor || "#475569")
       setCurrentLegendFontFamily(parsedConfig.legendFontFamily || "Roboto")
       setCurrentXAxisLabelFontSize(parsedConfig.xAxisLabelFontSize || 12)
-      setCurrentXAxisLabelFontColor(parsedConfig.xAxisLabelFontColor || "#E0E0E0")
+      setCurrentXAxisLabelFontColor(parsedConfig.xAxisLabelFontColor || "#475569")
       setCurrentXAxisLabelFontFamily(parsedConfig.xAxisLabelFontFamily || "Roboto")
       setCurrentYAxisLabelFontSize(parsedConfig.yAxisLabelFontSize || 12)
-      setCurrentYAxisLabelFontColor(parsedConfig.yAxisLabelFontColor || "#E0E0E0")
+      setCurrentYAxisLabelFontColor(parsedConfig.yAxisLabelFontColor || "#475569")
       setCurrentYAxisLabelFontFamily(parsedConfig.yAxisLabelFontFamily || "Roboto")
       if (parsedConfig.is3D) {
         setCurrentZAxisLabelFontSize(parsedConfig.zAxisLabelFontSize || 12)
-        setCurrentZAxisLabelFontColor(parsedConfig.zAxisLabelFontColor || "#E0E0E0")
+        setCurrentZAxisLabelFontColor(parsedConfig.zAxisLabelFontColor || "#475569")
         setCurrentZAxisLabelFontFamily(parsedConfig.zAxisLabelFontFamily || "Roboto")
       }
-
       setLoading(false)
     } catch (err) {
       console.error("Error loading chart config:", err)
@@ -147,7 +109,6 @@ export default function ChartPage() {
     }
   }, [chartId])
 
-  // Render/re-render chart when config or customization states change
   useEffect(() => {
     if (chartConfig && chartRef.current) {
       renderChart()
@@ -156,41 +117,21 @@ export default function ChartPage() {
       if (plotlyInstance.current && chartRef.current) {
         try {
           window.Plotly?.purge(chartRef.current)
-        } catch (e) {
-          console.log("Plotly cleanup error:", e)
-        }
+        } catch (e) { console.log("Plotly cleanup error:", e) }
         plotlyInstance.current = null
       }
     }
   }, [
-    chartConfig,
-    currentChartTitle,
-    currentSelectedTheme,
-    currentShowLegend,
-    currentShowGrid,
-    currentPlotBgColor,
-    currentPaperBgColor,
-    currentFontColor,
-    currentGlobalFontSize,
-    currentGlobalFontFamily,
-    currentLegendFontSize,
-    currentLegendFontColor,
-    currentLegendFontFamily,
-    currentXAxisLabelFontSize,
-    currentXAxisLabelFontColor,
-    currentXAxisLabelFontFamily,
-    currentYAxisLabelFontSize,
-    currentYAxisLabelFontColor,
-    currentYAxisLabelFontFamily,
-    currentZAxisLabelFontSize,
-    currentZAxisLabelFontColor,
-    currentZAxisLabelFontFamily,
+    chartConfig, currentChartTitle, currentSelectedTheme, currentShowLegend, currentShowGrid,
+    currentPlotBgColor, currentPaperBgColor, currentFontColor, currentGlobalFontSize,
+    currentGlobalFontFamily, currentLegendFontSize, currentLegendFontColor, currentLegendFontFamily,
+    currentXAxisLabelFontSize, currentXAxisLabelFontColor, currentXAxisLabelFontFamily,
+    currentYAxisLabelFontSize, currentYAxisLabelFontColor, currentYAxisLabelFontFamily,
+    currentZAxisLabelFontSize, currentZAxisLabelFontColor, currentZAxisLabelFontFamily,
   ])
 
   const renderChart = async () => {
-    if (!chartRef.current || !chartConfig) return
-
-    // Load Plotly dynamically
+    if (!chartRef.current || !chartConfig) return;
     if (!window.Plotly) {
       try {
         const Plotly = await import("plotly.js-dist")
@@ -204,40 +145,22 @@ export default function ChartPage() {
 
     try {
       const { type, xData, yData, zData, xAxis, yAxis, zAxis, is3D } = chartConfig
-
       const themeColors = colorThemes.find((t) => t.name === currentSelectedTheme)?.colors || colorThemes[0].colors
       const primaryColor = themeColors[0]
 
       let plotData = []
       let layout = {
-        title: {
-          text: currentChartTitle,
-          font: {
-            color: currentFontColor,
-            size: currentGlobalFontSize,
-            family: currentGlobalFontFamily,
-          },
-        },
+        title: { text: currentChartTitle, font: { color: '#334155', size: currentGlobalFontSize, family: currentGlobalFontFamily }},
         showlegend: currentShowLegend,
         margin: { l: 60, r: 60, b: 60, t: 80, pad: 4 },
-        paper_bgcolor: currentPaperBgColor,
-        plot_bgcolor: currentPlotBgColor,
-        font: {
-          color: currentFontColor,
-          size: currentGlobalFontSize,
-          family: currentGlobalFontFamily,
-        },
-        legend: {
-          font: {
-            size: currentLegendFontSize,
-            color: currentLegendFontColor,
-            family: currentLegendFontFamily,
-          },
-        },
-        colorway: themeColors, // Use the selected theme colors
+        paper_bgcolor: 'rgba(255, 255, 255, 0.8)',
+        plot_bgcolor: 'rgba(241, 245, 249, 0.8)',
+        font: { color: '#475569', size: currentGlobalFontSize, family: currentGlobalFontFamily },
+        legend: { font: { size: currentLegendFontSize, color: currentLegendFontColor, family: currentLegendFontFamily }},
+        colorway: themeColors,
       }
 
-      // Configure chart based on type
+// Configure chart based on type
       if (is3D) {
         // 3D chart configuration
         switch (type) {
@@ -464,7 +387,6 @@ export default function ChartPage() {
           }
         }
       }
-
       // Use Plotly.react for updates, or newPlot for initial render
       if (plotlyInstance.current) {
         await window.Plotly.react(chartRef.current, plotData, layout, {
@@ -493,7 +415,6 @@ export default function ChartPage() {
       setError("Failed to render chart")
     }
   }
-
   const downloadChart = async () => {
     if (plotlyInstance.current && chartRef.current) {
       try {
@@ -526,9 +447,9 @@ export default function ChartPage() {
       })
   }
 
-  const saveCustomization = () => {
-    if (!chartConfig) return
 
+  const saveCustomization = () => {
+    if (!chartConfig) return;
     const updatedConfig = {
       ...chartConfig,
       chartTitle: currentChartTitle,
@@ -552,13 +473,12 @@ export default function ChartPage() {
       zAxisLabelFontSize: chartConfig.is3D ? currentZAxisLabelFontSize : null,
       zAxisLabelFontColor: chartConfig.is3D ? currentZAxisLabelFontColor : null,
       zAxisLabelFontFamily: chartConfig.is3D ? currentZAxisLabelFontFamily : null,
-    }
-
-    localStorage.setItem(`chartConfig_${chartId}`, JSON.stringify(updatedConfig))
-    toast.success("Chart customizations saved!")
-  }
-
-  if (loading) {
+    };
+    localStorage.setItem(`chartConfig_${chartId}`, JSON.stringify(updatedConfig));
+    setChartConfig(updatedConfig); // This will trigger a re-render
+    toast.success("Chart customizations saved!");
+  };
+if (loading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: "#1C1C1C" }}>
         <div className="container mx-auto py-10 px-4">
@@ -622,494 +542,72 @@ export default function ChartPage() {
     )
   }
 
+
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#1C1C1C" }}>
+    <div className="min-h-screen w-full bg-slate-50 text-slate-800">
       <div className="container mx-auto py-10 px-4">
         <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/dashboard")}
-            className="w-full sm:w-auto border-[#00FFFF] text-[#00FFFF] hover:bg-[#1C1C1C] hover:border-[#66D9EF] bg-transparent"
-            style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
-          >
+          <Button variant="outline" onClick={() => navigate("/dashboard/charts")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+            Back to Charts
           </Button>
-          <div className="flex flex-wrap justify-center gap-2 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              onClick={downloadChart}
-              className="border-[#00FFFF] text-[#00FFFF] hover:bg-[#1C1C1C] hover:border-[#66D9EF] bg-transparent"
-              style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download PNG
-            </Button>
-            <Button
-              variant="outline"
-              onClick={shareChart}
-              className="border-[#00FFFF] text-[#00FFFF] hover:bg-[#1C1C1C] hover:border-[#66D9EF] bg-transparent"
-              style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowCustomization(!showCustomization)}
-              className="border-[#00FFFF] text-[#00FFFF] hover:bg-[#1C1C1C] hover:border-[#66D9EF] bg-transparent"
-              style={{ borderColor: "#00FFFF", color: "#00FFFF" }}
-            >
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button variant="outline" onClick={downloadChart}><Download className="h-4 w-4 mr-2" />Download PNG</Button>
+            <Button variant="outline" onClick={shareChart}><Share2 className="h-4 w-4 mr-2" />Share</Button>
+            <Button onClick={() => setShowCustomization(!showCustomization)}>
               <Settings className="h-4 w-4 mr-2" />
               {showCustomization ? "Hide" : "Customize"}
             </Button>
           </div>
         </div>
-
+        
         <div className={`grid ${showCustomization ? "grid-cols-1 lg:grid-cols-3 gap-6" : "grid-cols-1"}`}>
-          {showCustomization && (
-            <Card
-              className="lg:col-span-1 text-white border border-[#333333] rounded-xl py-4 px-6 relative overflow-hidden max-h-[calc(100vh-150px)] overflow-y-auto"
-              style={{
-                backgroundColor: "rgba(28, 28, 28, 0.8)", // Slightly transparent dark gray
-                borderColor: "#00FFFF", // Primary accent border
-                boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)", // Primary accent shadow
-              }}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg text-[#00FFFF]">
-                  <Settings className="h-5 w-5" />
-                  Chart Customization
-                </CardTitle>
-                <CardDescription className="text-[#66D9EF]">
-                  Adjust the appearance of your chart in real-time.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* General Settings */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="chart-title" className="text-sm text-[#66D9EF]">
-                      Chart Title
-                    </Label>
-                    <Input
-                      id="chart-title"
-                      value={currentChartTitle}
-                      onChange={(e) => setCurrentChartTitle(e.target.value)}
-                      placeholder="Enter chart title"
-                      className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="color-theme" className="text-sm text-[#66D9EF]">
-                      Color Theme
-                    </Label>
-                    <Select value={currentSelectedTheme} onValueChange={setCurrentSelectedTheme}>
-                      <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                        <SelectValue placeholder="Select theme" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                        {colorThemes.map((theme) => (
-                          <SelectItem key={theme.name} value={theme.name}>
-                            <div className="flex items-center gap-2">
-                              <span>{theme.name}</span>
-                              <div className="flex gap-1">
-                                {theme.colors.slice(0, 3).map((color, idx) => (
-                                  <div key={idx} className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-                                ))}
-                              </div>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="legend-toggle" className="text-sm text-[#66D9EF]">
-                      Show Legend
-                    </Label>
-                    <Switch id="legend-toggle" checked={currentShowLegend} onCheckedChange={setCurrentShowLegend} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="grid-toggle" className="text-sm text-[#66D9EF]">
-                      Show Grid Lines
-                    </Label>
-                    <Switch id="grid-toggle" checked={currentShowGrid} onCheckedChange={setCurrentShowGrid} />
-                  </div>
-                </div>
-
-                <Separator className="my-4 bg-[#333333]" />
-
-                {/* Background & Global Font Colors */}
-                <h5 className="text-md font-medium text-[#00FFFF]">Background & Global Colors</h5>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="plot-bg-color" className="text-sm text-[#66D9EF]">
-                      Plot Background
-                    </Label>
-                    <Input
-                      id="plot-bg-color"
-                      type="color"
-                      value={currentPlotBgColor}
-                      onChange={(e) => setCurrentPlotBgColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="paper-bg-color" className="text-sm text-[#66D9EF]">
-                      Paper Background
-                    </Label>
-                    <Input
-                      id="paper-bg-color"
-                      type="color"
-                      value={currentPaperBgColor}
-                      onChange={(e) => setCurrentPaperBgColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="font-color" className="text-sm text-[#66D9EF]">
-                      Global Font Color
-                    </Label>
-                    <Input
-                      id="font-color"
-                      type="color"
-                      value={currentFontColor}
-                      onChange={(e) => setCurrentFontColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="global-font-size" className="text-sm text-[#66D9EF]">
-                      Global Font Size
-                    </Label>
-                    <Input
-                      id="global-font-size"
-                      type="number"
-                      value={currentGlobalFontSize}
-                      onChange={(e) => setCurrentGlobalFontSize(Number(e.target.value))}
-                      min="8"
-                      max="32"
-                      className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="global-font-family" className="text-sm text-[#66D9EF]">
-                      Global Font Family
-                    </Label>
-                    <Select value={currentGlobalFontFamily} onValueChange={setCurrentGlobalFontFamily}>
-                      <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                        {fontFamilies.map((font) => (
-                          <SelectItem key={font} value={font}>
-                            {font}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Separator className="my-4 bg-[#333333]" />
-
-                {/* Font Customization */}
-                <h5 className="text-md font-medium text-[#00FFFF]">Legend Font</h5>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="legend-font-size" className="text-sm text-[#66D9EF]">
-                      Size
-                    </Label>
-                    <Input
-                      id="legend-font-size"
-                      type="number"
-                      value={currentLegendFontSize}
-                      onChange={(e) => setCurrentLegendFontSize(Number(e.target.value))}
-                      min="8"
-                      max="32"
-                      className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="legend-font-color" className="text-sm text-[#66D9EF]">
-                      Color
-                    </Label>
-                    <Input
-                      id="legend-font-color"
-                      type="color"
-                      value={currentLegendFontColor}
-                      onChange={(e) => setCurrentLegendFontColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2 col-span-full">
-                    <Label htmlFor="legend-font-family" className="text-sm text-[#66D9EF]">
-                      Font Family
-                    </Label>
-                    <Select value={currentLegendFontFamily} onValueChange={setCurrentLegendFontFamily}>
-                      <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                        {fontFamilies.map((font) => (
-                          <SelectItem key={font} value={font}>
-                            {font}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Separator className="my-4 bg-[#333333]" />
-
-                <h5 className="text-md font-medium text-[#00FFFF]">X-Axis Label Font</h5>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="xaxis-font-size" className="text-sm text-[#66D9EF]">
-                      Size
-                    </Label>
-                    <Input
-                      id="xaxis-font-size"
-                      type="number"
-                      value={currentXAxisLabelFontSize}
-                      onChange={(e) => setCurrentXAxisLabelFontSize(Number(e.target.value))}
-                      min="8"
-                      max="32"
-                      className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="xaxis-font-color" className="text-sm text-[#66D9EF]">
-                      Color
-                    </Label>
-                    <Input
-                      id="xaxis-font-color"
-                      type="color"
-                      value={currentXAxisLabelFontColor}
-                      onChange={(e) => setCurrentXAxisLabelFontColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2 col-span-full">
-                    <Label htmlFor="xaxis-font-family" className="text-sm text-[#66D9EF]">
-                      Font Family
-                    </Label>
-                    <Select value={currentXAxisLabelFontFamily} onValueChange={setCurrentXAxisLabelFontFamily}>
-                      <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                        {fontFamilies.map((font) => (
-                          <SelectItem key={font} value={font}>
-                            {font}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Separator className="my-4 bg-[#333333]" />
-
-                <h5 className="text-md font-medium text-[#00FFFF]">Y-Axis Label Font</h5>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="yaxis-font-size" className="text-sm text-[#66D9EF]">
-                      Size
-                    </Label>
-                    <Input
-                      id="yaxis-font-size"
-                      type="number"
-                      value={currentYAxisLabelFontSize}
-                      onChange={(e) => setCurrentYAxisLabelFontSize(Number(e.target.value))}
-                      min="8"
-                      max="32"
-                      className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="yaxis-font-color" className="text-sm text-[#66D9EF]">
-                      Color
-                    </Label>
-                    <Input
-                      id="yaxis-font-color"
-                      type="color"
-                      value={currentYAxisLabelFontColor}
-                      onChange={(e) => setCurrentYAxisLabelFontColor(e.target.value)}
-                      className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2 col-span-full">
-                    <Label htmlFor="yaxis-font-family" className="text-sm text-[#66D9EF]">
-                      Font Family
-                    </Label>
-                    <Select value={currentYAxisLabelFontFamily} onValueChange={setCurrentYAxisLabelFontFamily}>
-                      <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                        {fontFamilies.map((font) => (
-                          <SelectItem key={font} value={font}>
-                            {font}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {chartConfig.is3D && (
-                  <>
-                    <Separator className="my-4 bg-[#333333]" />
-                    <h5 className="text-md font-medium text-[#00FFFF]">Z-Axis Label Font</h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="zaxis-font-size" className="text-sm text-[#66D9EF]">
-                          Size
-                        </Label>
-                        <Input
-                          id="zaxis-font-size"
-                          type="number"
-                          value={currentZAxisLabelFontSize}
-                          onChange={(e) => setCurrentZAxisLabelFontSize(Number(e.target.value))}
-                          min="8"
-                          max="32"
-                          className="mt-1 border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="zaxis-font-color" className="text-sm text-[#66D9EF]">
-                          Color
-                        </Label>
-                        <Input
-                          id="zaxis-font-color"
-                          type="color"
-                          value={currentZAxisLabelFontColor}
-                          onChange={(e) => setCurrentZAxisLabelFontColor(e.target.value)}
-                          className="mt-1 h-10 w-full border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] cursor-pointer p-0.5 rounded-md"
-                        />
-                      </div>
-                      <div className="space-y-2 col-span-full">
-                        <Label htmlFor="zaxis-font-family" className="text-sm text-[#66D9EF]">
-                          Font Family
-                        </Label>
-                        <Select value={currentZAxisLabelFontFamily} onValueChange={setCurrentZAxisLabelFontFamily}>
-                          <SelectTrigger className="border-[#333333] bg-[#1C1C1C] text-[#E0E0E0] focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF]">
-                            <SelectValue placeholder="Select font" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-[#1C1C1C] border-[#333333] text-[#E0E0E0]">
-                            {fontFamilies.map((font) => (
-                              <SelectItem key={font} value={font}>
-                                {font}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div className="flex justify-end pt-4">
-                  <Button
-                    onClick={saveCustomization}
-                    className="flex items-center gap-2 bg-[#00FFFF] hover:bg-[#66D9EF] text-black"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Customization
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          <div className={`${showCustomization ? "lg:col-span-2" : "col-span-1"} min-w-0`}>
-            <Card
-              style={{
-                backgroundColor: "rgba(28, 28, 28, 0.8)",
-                borderColor: "#00FFFF",
-                boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)",
-              }}
-            >
-              <CardHeader style={{ borderBottomColor: "rgba(3, 218, 198, 0.3)" }}>
-                <CardTitle className="flex items-center gap-2" style={{ color: "#00FFFF" }}>
-                  {chartConfig.is3D && <Cube className="h-5 w-5" style={{ color: "#00FFFF" }} />}
-                  {currentChartTitle}
-                </CardTitle>
-                <CardDescription style={{ color: "rgba(102, 217, 239, 0.7)" }}>
-                  Generated from {chartConfig.fileName} • {chartConfig.type} chart • {currentSelectedTheme} theme
-                  {chartConfig.is3D && " • 3D Visualization"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-[600px] w-full p-4">
-                  <div ref={chartRef} className="w-full h-full"></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card
-                style={{
-                  backgroundColor: "rgba(28, 28, 28, 0.8)",
-                  borderColor: "#00FFFF",
-                  boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)",
-                }}
-              >
-                <CardContent className="p-4">
-                  <p style={{ color: "rgba(102, 217, 239, 0.7)", fontSize: "0.875rem" }}>Chart Type</p>
-                  <p style={{ color: "#00FFFF", fontWeight: "600", textTransform: "capitalize" }}>{chartConfig.type}</p>
-                </CardContent>
-              </Card>
-              <Card
-                style={{
-                  backgroundColor: "rgba(28, 28, 28, 0.8)",
-                  borderColor: "#00FFFF",
-                  boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)",
-                }}
-              >
-                <CardContent className="p-4">
-                  <p style={{ color: "rgba(102, 217, 239, 0.7)", fontSize: "0.875rem" }}>X-Axis</p>
-                  <p style={{ color: "#00FFFF", fontWeight: "600" }}>{chartConfig.xAxis}</p>
-                </CardContent>
-              </Card>
-              <Card
-                style={{
-                  backgroundColor: "rgba(28, 28, 28, 0.8)",
-                  borderColor: "#00FFFF",
-                  boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)",
-                }}
-              >
-                <CardContent className="p-4">
-                  <p style={{ color: "rgba(102, 217, 239, 0.7)", fontSize: "0.875rem" }}>Y-Axis</p>
-                  <p style={{ color: "#00FFFF", fontWeight: "600" }}>{chartConfig.yAxis}</p>
-                </CardContent>
-              </Card>
-              <Card
-                style={{
-                  backgroundColor: "rgba(28, 28, 28, 0.8)",
-                  borderColor: "#00FFFF",
-                  boxShadow: "0 0 10px rgba(3, 218, 198, 0.3)",
-                }}
-              >
-                <CardContent className="p-4">
-                  <p style={{ color: "rgba(102, 217, 239, 0.7)", fontSize: "0.875rem" }}>
-                    {chartConfig.is3D ? "Z-Axis" : "Data Points"}
-                  </p>
-                  <p style={{ color: "#00FFFF", fontWeight: "600" }}>
-                    {chartConfig.is3D ? chartConfig.zAxis : chartConfig.xData?.length || 0}
-                  </p>
-                </CardContent>
-              </Card>
+            {showCustomization && (
+                <Card className="lg:col-span-1 bg-white/80 backdrop-blur-lg max-h-[calc(100vh-150px)] overflow-y-auto">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Settings className="h-5 w-5" /> Chart Customization
+                        </CardTitle>
+                        <CardDescription>Adjust the appearance of your chart.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="chart-title">Chart Title</Label>
+                            <Input id="chart-title" value={currentChartTitle} onChange={(e) => setCurrentChartTitle(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="color-theme">Color Theme</Label>
+                            <Select value={currentSelectedTheme} onValueChange={setCurrentSelectedTheme}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{colorThemes.map(theme => <SelectItem key={theme.name} value={theme.name}>{theme.name}</SelectItem>)}</SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-md border"><Label>Show Legend</Label><Switch checked={currentShowLegend} onCheckedChange={setCurrentShowLegend} /></div>
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-md border"><Label>Show Grid Lines</Label><Switch checked={showGrid} onCheckedChange={setShowGrid} /></div>
+                        <Separator />
+                        <div className="flex justify-end pt-4">
+                            <Button onClick={saveCustomization}><Save className="h-4 w-4 mr-2" />Save Customization</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+            <div className={`${showCustomization ? "lg:col-span-2" : "col-span-1"} min-w-0`}>
+                <Card className="bg-white/80 backdrop-blur-lg">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            {chartConfig.is3D && <Cube className="h-5 w-5" />} {currentChartTitle}
+                        </CardTitle>
+                        <CardDescription>
+                            Generated from {chartConfig.fileName}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="h-[600px] w-full p-4">
+                            <div ref={chartRef} className="w-full h-full"></div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
-          </div>
         </div>
       </div>
     </div>

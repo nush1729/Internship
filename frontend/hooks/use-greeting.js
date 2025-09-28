@@ -25,27 +25,13 @@ export function useGreeting() {
     }
   };
 
-  const getGreetingEmoji = () => {
-    const hour = currentTime.getHours();
-    
-    if (hour >= 5 && hour < 12) {
-      return "🌅"; // Morning sunrise
-    } else if (hour >= 12 && hour < 17) {
-      return "☀️"; // Afternoon sun
-    } else if (hour >= 17 && hour < 22) {
-      return "🌆"; // Evening sunset
-    } else {
-      return "🌙"; // Night moon
-    }
-  };
-
   const getTimeBasedMessage = () => {
     const hour = currentTime.getHours();
     
     if (hour >= 5 && hour < 12) {
       return "Start your day with fresh insights from your data!";
     } else if (hour >= 12 && hour < 17) {
-      return "Ready to analyze your data? You have new insights waiting.";
+      return "Dive into your data and discover new insights.";
     } else if (hour >= 17 && hour < 22) {
       return "Wind down with some data visualization and analysis.";
     } else {
@@ -73,7 +59,6 @@ export function useGreeting() {
   return {
     currentTime,
     getGreeting,
-    getGreetingEmoji,
     getTimeBasedMessage,
     formatDate,
     formatTime,

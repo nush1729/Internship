@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, FileUp, BarChart3, Presentation } from "lucide-react";
 import { handleLogin, handleSignup, handleGoogleLogin } from "@/services/api";
 import { useNavigate } from "react-router-dom";
+import Aurora from "@/components/ui/aurora";
+import GradientText from "@/components/ui/gradienttext";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -99,329 +101,330 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-gray-100 overflow-hidden text-gray-800">
-      <div className="absolute inset-0 z-0 h-full bg-gradient-to-br from-white via-gray-50 to-blue-100"></div>
-      <div className="relative z-10 flex flex-col lg:flex-row min-h-screen items-center justify-center lg:p-8">
-        <div className="flex-1 flex items-center justify-center p-12">
-            <div className="max-w-md text-left space-y-8">
-              <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-gray-900">
-                <span className="block">Visualize Instantly.</span>
-                <span className="block bg-gradient-to-r from-blue-500 to-indigo-500 text-transparent bg-clip-text px-2 py-1 rounded-md inline-block">
-                  Excel Analytics.
-                </span>
-              </h1>
-              <div className="space-y-10 mt-10">
-                <div className="animate-float" style={{ animationDelay: '0s' }}>
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-9 h-9 flex items-center justify-center rounded-md bg-blue-100 border border-blue-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bar-chart-3 text-blue-600"><path d="M3 3v18h18" /><path d="M18 17v-6" /><path d="M13 17V9" /><path d="M8 17V5" /></svg>
-                    </div>
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      Instant Excel Upload
-                    </h2>
-                  </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Drag and drop your Excel files to immediately begin exploring data. Our platform parses sheets and prepares it for fast visual analysis.
-                  </p>
-                </div>
-                <div className="animate-float" style={{ animationDelay: '0.5s' }}>
-                   <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-9 h-9 flex items-center justify-center rounded-md bg-indigo-100 border border-indigo-200">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-presentation-chart text-indigo-600"><path d="M2 3h20" /><path d="M4 3v13a8 8 0 0 0 16 0V3" /><path d="M12 12v5" /><path d="M8 12v3" /><path d="M16 12v2" /></svg>
-                    </div>
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      2D & 3D Chart Builder
-                    </h2>
-                  </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Instantly generate interactive 2D and 3D visualizations from your data — no coding required. Customize and share with ease.
-                  </p>
-                </div>
-              </div>
+    <div className="relative min-h-screen w-full bg-[#0a0a23] text-white overflow-hidden">
+      <div className="absolute inset-0 z-0 opacity-40 h-full">
+        <Aurora
+          colorStops={["#0038ff", "#00d4ff", "#002233"]}
+          amplitude={0.8}
+          blend={1}
+        />
+      </div>
+      <div className="absolute inset-0 z-0 opacity-40 scale-y-[-1]">
+        <Aurora
+          colorStops={["#0038ff", "#00d4ff", "#002233"]}
+          amplitude={0.8}
+          blend={1}
+        />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+        {/* Top Content Section */}
+        <div className="w-full max-w-4xl text-center mb-12">
+          <GradientText
+            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4"
+            colors={["#00ffff", "#66D9EF", "#b8e2f4"]}
+          >
+            Excel Analytics
+          </GradientText>
+          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
+            Drag, drop, and visualize. Instantly generate interactive 2D & 3D
+            charts from your Excel data — no coding required.
+          </p>
+          <div className="flex justify-center items-center gap-8 mt-8 text-slate-400">
+            <div className="flex items-center gap-2">
+              <FileUp className="w-5 h-5 text-cyan-400" />
+              <span>Instant Upload</span>
             </div>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-cyan-400" />
+              <span>2D & 3D Charts</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Presentation className="w-5 h-5 text-cyan-400" />
+              <span>Easy Sharing</span>
+            </div>
+          </div>
         </div>
-        <div className="flex-1 flex items-center justify-center">
-            <Card className="w-full max-w-md bg-white/80 backdrop-blur-lg border border-gray-200 rounded-xl py-8 px-4 shadow-lg">
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full px-4"
+
+        {/* Auth Card Section */}
+        <Card className="w-full max-w-md bg-black/40 backdrop-blur-lg border border-blue-900/50 rounded-xl py-8 px-4 shadow-2xl shadow-blue-500/10">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full px-4"
+          >
+            <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 text-slate-400 border border-slate-700 rounded-lg mb-6">
+              <TabsTrigger
+                value="login"
+                className="data-[state=active]:bg-slate-700/50 data-[state=active]:text-cyan-300 data-[state=active]:shadow-md rounded-md"
               >
-                <TabsList className="grid w-full grid-cols-2 bg-gray-200 text-gray-500 border border-gray-300 rounded-lg mb-6">
-                  <TabsTrigger
-                    value="login"
-                    className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md rounded-lg"
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                className="data-[state=active]:bg-slate-700/50 data-[state=active]:text-cyan-300 data-[state=active]:shadow-md rounded-md"
+              >
+                Sign Up
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-3xl text-white font-bold">
+                  Welcome back
+                </CardTitle>
+                <CardDescription className="text-slate-400 mt-2">
+                  Sign in to access your dashboard
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLogin(loginData, navigate);
+                  }}
+                  className="space-y-6"
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email" className="text-slate-300">
+                      Email
+                    </Label>
+                    <Input
+                      id="login-email"
+                      type="email"
+                      className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-400"
+                      placeholder="your.email@example.com"
+                      onChange={(e) =>
+                        setLoginData({
+                          ...loginData,
+                          email: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password" className="text-slate-300">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="login-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pr-10 focus:border-cyan-400"
+                        onChange={(e) =>
+                          setLoginData({
+                            ...loginData,
+                            password: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-2 rounded-lg transition-all duration-300"
                   >
                     Sign In
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="signup"
-                    className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md rounded-lg"
+                  </Button>
+                </form>
+                <Separator className="my-6 bg-slate-700" />
+                <Button
+                  onClick={initiateGoogleLogin}
+                  disabled={googleLoading}
+                  className="w-full bg-slate-800/50 hover:bg-slate-700/50 text-white font-bold border border-slate-700 py-2 rounded-lg transition-all duration-300 disabled:opacity-50"
+                >
+                  {googleLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Signing in...
+                    </div>
+                  ) : (
+                    "Continue with Google"
+                  )}
+                </Button>
+                <div
+                  id="google-signin-button"
+                  className="w-full mt-2"
+                  style={{ display: "none" }}
+                ></div>
+              </CardContent>
+            </TabsContent>
+            <TabsContent value="signup">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-3xl text-white font-bold">
+                  Create an Account
+                </CardTitle>
+                <CardDescription className="text-slate-400 mt-2">
+                  Join now and start visualizing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSignup({ ...signupData, role: "user" }, navigate);
+                  }}
+                  className="space-y-6"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="first-name" className="text-slate-300">
+                        First name
+                      </Label>
+                      <Input
+                        id="first-name"
+                        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-400"
+                        placeholder="John"
+                        value={signupData.firstName}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            firstName: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="last-name" className="text-slate-300">
+                        Last name
+                      </Label>
+                      <Input
+                        id="last-name"
+                        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-400"
+                        placeholder="Doe"
+                        value={signupData.lastName}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            lastName: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-slate-300">
+                      Email
+                    </Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-cyan-400"
+                      placeholder="your.email@example.com"
+                      value={signupData.email}
+                      onChange={(e) =>
+                        setSignupData({
+                          ...signupData,
+                          email: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="signup-password"
+                      className="text-slate-300"
+                    >
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pr-10 focus:border-cyan-400"
+                        value={signupData.password}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            password: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="confirm-password"
+                      className="text-slate-300"
+                    >
+                      Confirm password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pr-10 focus:border-cyan-400"
+                        value={signupData.confirmPassword}
+                        onChange={(e) =>
+                          setSignupData({
+                            ...signupData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full font-bold py-2 rounded-lg transition-all duration-300 bg-cyan-500 hover:bg-cyan-600 text-black"
                   >
-                    Sign Up
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="login">
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-3xl text-gray-800 font-bold">
-                      Welcome back
-                    </CardTitle>
-                    <CardDescription className="text-gray-500 mt-2">
-                      Sign in to access your data visualizations
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleLogin(loginData, navigate);
-                      }}
-                      className="space-y-6"
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="login-email">Email</Label>
-                        <Input
-                          id="login-email"
-                          type="email"
-                          className="bg-white"
-                          placeholder="your.email@example.com"
-                          onChange={(e) =>
-                            setLoginData({
-                              ...loginData,
-                              email: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="login-password">Password</Label>
-                        <div className="relative">
-                          <Input
-                            id="login-password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            className="bg-white pr-10"
-                            onChange={(e) =>
-                              setLoginData({
-                                ...loginData,
-                                password: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 text-gray-500 hover:bg-gray-100"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                      <Button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-all duration-300"
-                      >
-                        Sign In
-                      </Button>
-                    </form>
-                    <Separator className="my-6" />
-                    <Button
-                      onClick={initiateGoogleLogin}
-                      disabled={googleLoading}
-                      className="w-full bg-white hover:bg-gray-100 text-gray-800 font-bold border border-gray-300 py-2 rounded-lg transition-all duration-300 disabled:opacity-50"
-                    >
-                      {googleLoading ? (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-800 mr-2"></div>
-                          Signing in...
-                        </div>
-                      ) : (
-                        "Continue with Google"
-                      )}
-                    </Button>
-                    <div
-                      id="google-signin-button"
-                      className="w-full mt-2"
-                      style={{ display: "none" }}
-                    ></div>
-                  </CardContent>
-                </TabsContent>
-                <TabsContent value="signup">
-                  <CardHeader className="text-center">
-                    <CardTitle className="text-3xl text-gray-800 font-bold">
-                      Create account
-                    </CardTitle>
-                    <CardDescription className="text-gray-500 mt-2">
-                      Start visualizing your Excel data today
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSignup({ ...signupData, role: "user" }, navigate);
-                      }}
-                      className="space-y-6"
-                    >
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="first-name">First name</Label>
-                          <Input
-                            id="first-name"
-                            className="bg-white"
-                            placeholder="John"
-                            value={signupData.firstName}
-                            onChange={(e) =>
-                              setSignupData({
-                                ...signupData,
-                                firstName: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="last-name">Last name</Label>
-                          <Input
-                            id="last-name"
-                            className="bg-white"
-                            placeholder="Doe"
-                            value={signupData.lastName}
-                            onChange={(e) =>
-                              setSignupData({
-                                ...signupData,
-                                lastName: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-email">Email</Label>
-                        <Input
-                          id="signup-email"
-                          type="email"
-                          className="bg-white"
-                          placeholder="your.email@example.com"
-                          value={signupData.email}
-                          onChange={(e) =>
-                            setSignupData({
-                              ...signupData,
-                              email: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-password">Password</Label>
-                        <div className="relative">
-                          <Input
-                            id="signup-password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            className="bg-white pr-10"
-                            value={signupData.password}
-                            onChange={(e) =>
-                              setSignupData({
-                                ...signupData,
-                                password: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 text-gray-500 hover:bg-gray-100"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="confirm-password">
-                          Confirm password
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="confirm-password"
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            className="bg-white pr-10"
-                            value={signupData.confirmPassword}
-                            onChange={(e) =>
-                              setSignupData({
-                                ...signupData,
-                                confirmPassword: e.target.value,
-                              })
-                            }
-                            required
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 text-gray-500 hover:bg-gray-100"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                      <Button
-                        type="submit"
-                        className="w-full font-bold py-2 rounded-lg transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        Create Account
-                      </Button>
-                    </form>
-                    <Separator className="my-6" />
-                    <Button
-                      onClick={initiateGoogleLogin}
-                      disabled={googleLoading}
-                      className="w-full bg-white hover:bg-gray-100 text-gray-800 font-bold border border-gray-300 py-2 rounded-lg transition-all duration-300 disabled:opacity-50"
-                    >
-                      {googleLoading ? (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-800 mr-2"></div>
-                          Signing in...
-                        </div>
-                      ) : (
-                        "Continue with Google"
-                      )}
-                    </Button>
-                  </CardContent>
-                </TabsContent>
-              </Tabs>
-              <div
-                id="google-signin-button"
-                className="w-full mt-2"
-                style={{ display: "none" }}
-              ></div>
-            </Card>
-        </div>
+                    Create Account
+                  </Button>
+                </form>
+              </CardContent>
+            </TabsContent>
+          </Tabs>
+        </Card>
       </div>
     </div>
   );
